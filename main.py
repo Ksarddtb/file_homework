@@ -27,6 +27,14 @@ def write_file(filename,lst):
         f_w=DictWriter(data,fieldnames=['Имя','Фамилия','Телефон'])
         f_w.writeheader()
         f_w.writerows(res)
+
+def row_search(filename):
+    last_name=input('Введите Фамилию:')    
+    res=read_file(filename)
+    for row in res:
+        if last_name==row['Фамилия']:
+            return row
+    return "row not found"
     
 filename='phone.csv'
 
@@ -44,5 +52,10 @@ def main():
                 print('File not found create it')
                 continue
             print(read_file(filename))
+        elif command == 'f':
+            if not exists(filename):
+                print('File not found create it')
+                continue
+            print(row_search(filename))
             
 main()
