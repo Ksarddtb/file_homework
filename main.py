@@ -1,5 +1,5 @@
 from csv import DictWriter,DictReader
-
+from os.path import exists
 
 def get_date():
     first_name=input('Введите имя:')
@@ -16,3 +16,33 @@ def read_file(filename):
     with open(filename,'r',encoding='utf-8') as data:
         f_r=DictReader(data)
         return list(f_r)
+
+def write_file(filename,lst):
+    res=read_file(filename)
+    obj={'Имя':lst[0],
+         'Фамилия':lst[1],
+         'Телефон':lst[2]}
+    res.append(obj)
+    with open(filename,'w',encoding='utf-8') as data:
+        f_w=DictWriter(data,fieldnames=['Имя','Фамилия','Телефон'])
+        f_w.writeheader()
+        f_w.writerows(res)
+    
+filename='phone.csv'
+
+def main():
+    while True:
+        command=input('Введите комаду:')
+        if command == 'q':
+            break
+        elif command == 'w':
+            if not exists(filename):
+                create_file(filename)
+            write_file(filename,get_date())
+        elif command == 'r':
+            if not exists(filename):
+                print('File not found create it')
+                continue
+            print(read_file(filename))
+            
+main()
