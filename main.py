@@ -1,12 +1,37 @@
 from csv import DictWriter,DictReader
 from os.path import exists
 
-def get_date():
-    first_name=input('Введите имя:')
-    last_name=input('Введите Фамилию:')
-    phone=input('Введите телефон:')
-    return [first_name,last_name,phone]
+class NameError(Exception):
+    def __init__(self, txt):
+        self.txt=txt
 
+def get_date():
+    flag=False
+    while not flag:
+        try:
+            first_name=input('Введите имя:')
+            if len(first_name)<2:
+                raise NameError('Short Name')
+            last_name=input('Введите Фамилию:')
+            if len(last_name)<2:
+                raise NameError('Short Last Name')
+            phone=input('Введите телефон:')
+            if len(phone)<7:
+                raise NameError('Error Phone')
+        except NameError as err:
+            print(err)
+        else:
+            flag=True
+    return [first_name,last_name,phone]
+def print_list(res):
+    print('#\t','Имя\t','Фамилия\t','Телефон\t')
+    index=1
+    for row in res:
+        print(str(index)+"\t"+str(row["Имя"]+"\t")+str(row["Фамилия"]+"\t")+str(row["Телефон"]+"\t"))
+        index+=1
+        # print(row[1]+"\t")
+        # print(row[2]+"\t")
+        
 def create_file(filename):
     with open(filename,'w',encoding='utf-8') as data:
         f_w=DictWriter(data,fieldnames=['Имя','Фамилия','Телефон'])
@@ -53,6 +78,15 @@ def update_row(filename):
          'Фамилия':lst[1],
          'Телефон':lst[2]}
     standart_write(filename,res)
+    
+def migrate_row(filename):
+    number=int(input('Введите номер строки:'))    
+    filenew=str(input('Введите имя файла:'))+'.csv'
+    res=read_file(filename)
+    obj=res[number-1]
+    create_file(filenew)
+    write_file(filenew,[obj['Имя'],obj['Фамилия'],obj['Телефон']])
+    return filenew
 
 filename='phone.csv'
 
@@ -69,22 +103,28 @@ def main():
             if not exists(filename):
                 print('File not found create it')
                 continue
-            print(read_file(filename))
+            print_list(read_file(filename))
         elif command == 'f':
             if not exists(filename):
                 print('File not found create it')
                 continue
-            print(row_search(filename))
+            print_list(row_search(filename))
         elif command == 'd':
             if not exists(filename):
                 print('File not found create it')
                 continue
-            print(row_delete(filename))
+            print_list(row_delete(filename))
         elif command == 'u':
             if not exists(filename):
                 print('File not found create it')
                 continue
             update_row(filename)
-            print(read_file(filename))
+            print_list(read_file(filename))
+        elif command == 'c':
+            if not exists(filename):
+                print('File not found create it')
+                continue
+            newfile=migrate_row(filename)
+            print_list(read_file(newfile))
             
 main()
